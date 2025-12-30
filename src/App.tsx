@@ -135,10 +135,18 @@ const trainingContext = slides.map(s =>
   `Título: ${s.title}\nContenido: ${s.content}`
 ).join("\n\n");
 
+// Definimos el tipo de mensaje
+interface Message {
+  role: 'user' | 'assistant';
+  content: string;
+}
+
 export default function App() {
   const [currentScreen, setCurrentScreen] = useState<Screen>("home");
   const [currentSlide, setCurrentSlide] = useState(0);
   const [quizAnswers, setQuizAnswers] = useState<Record<number, string>>({});
+  const [messages, setMessages] = useState<Message[]>([]);
+  const [isLoading, setIsLoading] = useState(false);
 
   // Calcular resultados del quiz
   const calculateResults = () => {
@@ -157,7 +165,10 @@ export default function App() {
 
   // Esta función se ejecutará cuando el usuario haga clic en "Enviar" dentro del ChatInput
   const handleUserQuestion = async (message: string) => {
-    try {
+
+      const userMsg: Message = { role: 'user', content: message };
+      setMessages(prev => [...prev, userMsg]);
+      setIsLoading(true);
       
       const prompt = `
       Eres un asistente experto de capacitación de Laboratorios Laproff. 
@@ -171,19 +182,24 @@ export default function App() {
       - Responde de forma amable y profesional.
       - Si el usuario te pregunta algo que NO está en la información anterior, responde educadamente que esa información no está disponible en esta capacitación y sugiérele contactar a la Mesa de Ayuda.
       - Tus respuestas deben ser breves y directas.
+      - No es necesario que te presentes, expliques tu rol, saludes o des la bienvenida, se puntual con la información.
 
       Pregunta del usuario: ${message}
     `;
 
+    try {
+
       // 1. Llamamos a la API de Gemini
       const text = await aiChat(prompt);
 
-      // 2. Mostramos el resultado en un alert como pediste para el ensayo
-      alert(`IA dice: ${text}`);
+      const aiMsg: Message = { role: 'assistant', content: text || '' };
+      setMessages(prev => [...prev, aiMsg]);
 
     } catch (error) {
-      console.error("Error con la IA:", error);
-      alert("Hubo un error al conectar con el chatbot.");
+      console.error(error);
+      setMessages(prev => [...prev, { role: 'assistant', content: "Lo siento, hubo un error técnico." }]);
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -303,7 +319,36 @@ export default function App() {
                 isPlaying={true} 
                 subtitle={slide.subtitle}
               />              
-              <ChatInput onSendMessage={handleUserQuestion} />
+            
+                  <div className="flex flex-col gap-4">
+      {/* Contenedor del Chat (Nuevo) */}
+      <div className="flex flex-col h-[400px] bg-card border border-border rounded-lg overflow-hidden shadow-sm">
+        {/* Área de mensajes */}
+        <div className="flex-1 overflow-y-auto p-4 space-y-4 bg-slate-50/50">
+          {messages.length === 0 && (
+            <p className="text-center text-muted-foreground text-sm mt-10">
+              ¿Tienes dudas sobre la inducción de TICs? ¡Pregúntame!
+            </p>
+          )}
+          {messages.map((msg, index) => (
+            <div key={index} className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
+              <div className={`max-w-[80%] p-3 rounded-lg text-sm ${
+                msg.role === 'user' 
+                ? 'bg-primary text-primary-foreground rounded-br-none' 
+                : 'bg-white border border-border text-foreground rounded-bl-none shadow-sm'
+              }`}>
+                {msg.content}
+              </div>
+            </div>
+          ))}
+          {isLoading && <div className="text-xs text-muted-foreground animate-pulse">La IA está escribiendo...</div>}
+        </div>
+
+        {/* Tu componente ChatInput actual */}
+        <ChatInput onSendMessage={handleUserQuestion} />
+      </div>
+    </div>
+
             </div>
 
             {/* Slide Viewer */}
