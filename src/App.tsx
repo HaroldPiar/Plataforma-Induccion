@@ -119,7 +119,7 @@ const quizQuestions = [
 
 type Screen = "home" | "training" | "quiz" | "results";
 
-const genAI = new GoogleGenAI({apiKey: "AIzaSyDTYEoSIWbeDuJ-IwqDNKBezeF6Sqa6kqk"});
+const genAI = new GoogleGenAI({apiKey: "---"});
 
 async function aiChat(context: string) {
   
