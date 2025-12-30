@@ -14,7 +14,7 @@ export function ProgressBar({ current, total, label }: ProgressBarProps) {
       <div className="flex items-center justify-between text-sm text-gray-600">
         <span>{label || "Progreso"}</span>
         <span className="font-medium">
-          {current} de {total}
+          Diapositiva {current} de {total}
         </span>
       </div>
       <Progress value={percentage} className="h-2" />

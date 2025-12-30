@@ -7,6 +7,7 @@ import { ProgressBar } from "./components/ProgressBar";
 import { Button } from "./components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "./components/ui/card";
 import { Badge } from "./components/ui/badge";
+import { GoogleGenAI } from "@google/genai";
 import { 
   ChevronLeft, 
   ChevronRight, 
@@ -15,63 +16,7 @@ import {
   Home,
   Award
 } from "lucide-react";
-
-// Datos de ejemplo para las diapositivas
-/*const slides = [
-  {
-    title: "Bienvenida a la Empresa",
-    content: "Te damos la bienvenida a nuestra organización. Esta capacitación te ayudará a conocer nuestra cultura, valores y procedimientos básicos para que puedas integrarte exitosamente al equipo.",
-    imageUrl: "https://images.unsplash.com/photo-1758691736067-b309ee3ef7b9?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxjb3Jwb3JhdGUlMjB0cmFpbmluZyUyMGJ1c2luZXNzfGVufDF8fHx8MTc2MzE0MDg5OHww&ixlib=rb-4.1.0&q=80&w=1080",
-    subtitle: "Bienvenido a nuestra empresa, estamos emocionados de tenerte en el equipo."
-  },
-  {
-    title: "Nuestra Misión y Valores",
-    content: "Nuestra misión es proporcionar soluciones innovadoras que transformen la industria. Nos guiamos por valores fundamentales: integridad, excelencia, colaboración e innovación. Estos principios definen quiénes somos y cómo trabajamos.",
-    imageUrl: "https://images.unsplash.com/photo-1542744173-8e7e53415bb0?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxidXNpbmVzcyUyMHByZXNlbnRhdGlvbnxlbnwxfHx8fDE3NjMxMzUzMjB8MA&ixlib=rb-4.1.0&q=80&w=1080",
-    subtitle: "Conoce los valores que nos definen como organización."
-  },
-  {
-    title: "Estructura Organizacional",
-    content: "Nuestra empresa está organizada en diferentes departamentos: Ventas, Operaciones, Recursos Humanos, Tecnología y Finanzas. Cada departamento colabora estrechamente para alcanzar nuestros objetivos comunes.",
-    subtitle: "Descubre cómo está estructurada nuestra organización."
-  },
-  {
-    title: "Políticas de Seguridad",
-    content: "La seguridad es nuestra prioridad. Debes utilizar contraseñas seguras, reportar cualquier incidente de seguridad inmediatamente y seguir los protocolos de protección de datos. El acceso a información confidencial debe ser tratado con responsabilidad.",
-    subtitle: "Aprende sobre nuestras políticas de seguridad y protección de datos."
-  },
-  {
-    title: "Cultura de Trabajo",
-    content: "Fomentamos un ambiente de trabajo colaborativo, inclusivo y respetuoso. Valoramos la diversidad, promovemos el equilibrio entre vida personal y laboral, y brindamos oportunidades de crecimiento profesional continuo.",
-    imageUrl: "https://images.unsplash.com/photo-1642522029693-20b2ab875b19?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxwcm9mZXNzaW9uYWwlMjBvZmZpY2UlMjBtZWV0aW5nfGVufDF8fHx8MTc2MzA0NTQzMXww&ixlib=rb-4.1.0&q=80&w=1080",
-    subtitle: "Conoce nuestra cultura y cómo trabajamos juntos."
-  },
-  {
-    title: "Procedimientos Básicos",
-    content: "Para solicitar tiempo libre, utiliza el portal de RR.HH. Para reportes de gastos, completa el formulario correspondiente. Para soporte técnico, contacta al departamento de TI. Mantén actualizada tu información de contacto.",
-    subtitle: "Aprende los procedimientos esenciales del día a día."
-  },
-  {
-    title: "Beneficios y Compensaciones",
-    content: "Ofrecemos un paquete competitivo de beneficios que incluye seguro médico, días de vacaciones, bonos por desempeño, programas de capacitación y desarrollo, y actividades de bienestar corporativo.",
-    subtitle: "Descubre todos los beneficios que tenemos para ti."
-  },
-  {
-    title: "Comunicación Interna",
-    content: "Utilizamos diferentes canales de comunicación: correo electrónico para comunicaciones formales, plataforma de mensajería para comunicación rápida, y reuniones semanales de equipo. Mantente siempre conectado e informado.",
-    subtitle: "Conoce nuestros canales de comunicación."
-  },
-  {
-    title: "Desarrollo Profesional",
-    content: "Invertimos en el crecimiento de nuestro equipo. Tendrás acceso a capacitaciones, mentorías, certificaciones profesionales y oportunidades de promoción interna. Tu desarrollo es nuestra prioridad.",
-    subtitle: "Descubre las oportunidades de crecimiento que te esperan."
-  },
-  {
-    title: "Próximos Pasos",
-    content: "Ahora que has completado la inducción general, te invitamos a realizar la evaluación final. Tu supervisor te contactará para coordinar tus primeros días. ¡Bienvenido al equipo!",
-    subtitle: "Estás listo para comenzar tu aventura con nosotros."
-  }
-];*/
+import ChatInput from "./components/ChatInput";
 
 const slides = [
   {
@@ -140,61 +85,6 @@ const slides = [
   }
 ]
 
-
-// Preguntas de evaluación
-/*const quizQuestions = [
-  {
-    question: "¿Cuál es uno de los valores fundamentales de nuestra empresa?",
-    options: [
-      "Competitividad extrema",
-      "Integridad y colaboración",
-      "Individualismo",
-      "Secretismo"
-    ],
-    correctAnswer: "Integridad y colaboración"
-  },
-  {
-    question: "¿Qué debes hacer si identificas un incidente de seguridad?",
-    options: [
-      "Ignorarlo si es pequeño",
-      "Reportarlo inmediatamente",
-      "Solucionarlo por tu cuenta",
-      "Comentarlo solo con compañeros"
-    ],
-    correctAnswer: "Reportarlo inmediatamente"
-  },
-  {
-    question: "¿Cómo está organizada la empresa?",
-    options: [
-      "En una sola área general",
-      "En departamentos colaborativos",
-      "Sin estructura definida",
-      "Solo en equipos de ventas"
-    ],
-    correctAnswer: "En departamentos colaborativos"
-  },
-  {
-    question: "¿Qué tipo de cultura de trabajo promovemos?",
-    options: [
-      "Competitiva y agresiva",
-      "Colaborativa, inclusiva y respetuosa",
-      "Individual y aislada",
-      "Rígida y jerárquica"
-    ],
-    correctAnswer: "Colaborativa, inclusiva y respetuosa"
-  },
-  {
-    question: "¿Qué ofrece la empresa para el desarrollo profesional?",
-    options: [
-      "Solo el salario básico",
-      "Capacitaciones, mentorías y certificaciones",
-      "Ningún tipo de apoyo",
-      "Solo evaluaciones anuales"
-    ],
-    correctAnswer: "Capacitaciones, mentorías y certificaciones"
-  }
-];*/
-
 const quizQuestions = [
 
   {
@@ -229,6 +119,22 @@ const quizQuestions = [
 
 type Screen = "home" | "training" | "quiz" | "results";
 
+const genAI = new GoogleGenAI({apiKey: "AIzaSyDTYEoSIWbeDuJ-IwqDNKBezeF6Sqa6kqk"});
+
+async function aiChat(context: string) {
+  
+  const response = await genAI.models.generateContent({
+    model: "gemini-2.5-flash",
+    contents: context,
+  });
+  return response.text;
+
+}
+
+const trainingContext = slides.map(s => 
+  `Título: ${s.title}\nContenido: ${s.content}`
+).join("\n\n");
+
 export default function App() {
   const [currentScreen, setCurrentScreen] = useState<Screen>("home");
   const [currentSlide, setCurrentSlide] = useState(0);
@@ -245,8 +151,40 @@ export default function App() {
     return {
       correct,
       total: quizQuestions.length,
-      passed: correct >= 3 // 60% para aprobar
+      passed: correct >= 3
     };
+  };
+
+  // Esta función se ejecutará cuando el usuario haga clic en "Enviar" dentro del ChatInput
+  const handleUserQuestion = async (message: string) => {
+    try {
+      
+      const prompt = `
+      Eres un asistente experto de capacitación de Laboratorios Laproff. 
+      Tu objetivo es responder dudas sobre la inducción al departamento de TICs basándote EXCLUSIVAMENTE en la siguiente información:
+
+      --- INICIO DE INFORMACIÓN DE CAPACITACIÓN ---
+      ${trainingContext}
+      --- FIN DE INFORMACIÓN DE CAPACITACIÓN ---
+
+      Instrucciones adicionales:
+      - Responde de forma amable y profesional.
+      - Si el usuario te pregunta algo que NO está en la información anterior, responde educadamente que esa información no está disponible en esta capacitación y sugiérele contactar a la Mesa de Ayuda.
+      - Tus respuestas deben ser breves y directas.
+
+      Pregunta del usuario: ${message}
+    `;
+
+      // 1. Llamamos a la API de Gemini
+      const text = await aiChat(prompt);
+
+      // 2. Mostramos el resultado en un alert como pediste para el ensayo
+      alert(`IA dice: ${text}`);
+
+    } catch (error) {
+      console.error("Error con la IA:", error);
+      alert("Hubo un error al conectar con el chatbot.");
+    }
   };
 
   // Pantalla de Inicio
@@ -352,21 +290,20 @@ export default function App() {
                   Inducción TICs
                 </Badge>
               </div>
-              <div className="text-sm text-gray-600">
-                Slide {currentSlide + 1} de {slides.length}
-              </div>
+
             </div>
             <ProgressBar current={currentSlide + 1} total={slides.length} />
           </div>
 
           {/* Main Player Layout */}
           <div className="grid lg:grid-cols-2 gap-6 mb-6">
-            {/* Avatar Player */}
-            <div>
+            {/* Avatar Player  + Chatbot*/}
+            <div className="flex flex-col gap-4">
               <AvatarPlayer 
                 isPlaying={true} 
                 subtitle={slide.subtitle}
-              />
+              />              
+              <ChatInput onSendMessage={handleUserQuestion} />
             </div>
 
             {/* Slide Viewer */}
@@ -376,6 +313,7 @@ export default function App() {
                 content={slide.content}
                 imageUrl={slide.imageUrl}
               />
+
             </div>
           </div>
 
